@@ -19,14 +19,14 @@ if (debug == None):
 secret = form.getvalue('secret')
 method = form.getvalue('method')
 
-params = form.getvalue('params')
+#params = form.getvalue('params')
 
-# params = {
-# 	"UID": "_guid_e4WvAOTp8xsl8jmh2lbPHg==",
-# 	"categoryID": "comments1",
-# 	"streamID": "fiestas-primavera-1281:«he-vivido-experiencias-que-jamas-pense»",
-# 	"commentText": "«utf8-str2»"
-# }
+params = {
+	"UID": "_guid_e4WvAOTp8xsl8jmh2lbPHg==",
+	"categoryID": "comments1",
+	"streamID": "~#$%&'()*+,-./:;<=>?_«aZ09»",
+	"commentText": "«utf8-str2»"
+}
 
 useHttps = form.getvalue('useHttps') == "1" or form.getvalue('useHttps') == "true"
 userKey = form.getvalue('userKey')
