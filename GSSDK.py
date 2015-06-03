@@ -318,7 +318,7 @@ class GSRequest():
             return str(value)
         else:
             S = quote_plus(value.encode('utf-8'))
-            return S.replace("+", "%20")
+            return S.replace("+", "%20").replace("%7E", "~")
 
     def traceField(self, name, value):
         if value:
