@@ -6,6 +6,7 @@ import sys
 PY_3 = sys.version_info[0] >= 3
 
 if PY_3:
+    import urllib.request
     from urllib.parse import urlencode
     from urllib.request import build_opener
     from urllib.request import HTTPHandler
@@ -18,6 +19,7 @@ if PY_3:
     from urllib.parse import quote_plus
     from urllib.parse import urlparse
 else:
+    import urllib2
     from urllib import urlencode
     from urllib2 import build_opener
     from urllib2 import HTTPHandler
@@ -76,7 +78,7 @@ class GSException(Exception):
 
 class GSRequest():
     DEFAULT_API_DOMAIN = "us1.gigya.com"
-    VERSION = "2.16"
+    VERSION = "2.17"
     caCertsPath = os.path.join(os.path.dirname(__file__), "cacert.pem")
 
     _domain = ""
@@ -250,12 +252,15 @@ class GSRequest():
 
         queryString = queryString.encode('utf-8')
 
+        currentOpener = urllib.request._opener if PY_3 else urllib2._opener
         install_opener(opener)
 
         if timeout:
             response = urlopen(url, queryString, timeout)
         else:
             response = urlopen(url, queryString)
+
+        install_opener(currentOpener)
 
         result = response.read()
         result = result.decode('utf-8')
@@ -318,7 +323,7 @@ class GSRequest():
             return str(value)
         else:
             S = quote_plus(value.encode('utf-8'))
-            return S.replace("+", "%20")
+            return S.replace("+", "%20").replace("%7E", "~")
 
     def traceField(self, name, value):
         if value:
@@ -453,7 +458,6 @@ class ValidHTTPSConnection(HTTPConnection):
             self.sock = sock
             self._tunnel()
         self.sock = ssl.wrap_socket(sock, ca_certs=GSRequest.caCertsPath, cert_reqs=ssl.CERT_REQUIRED)
-
 
 class ValidHTTPSHandler(HTTPSHandler):
     def https_open(self, req):
