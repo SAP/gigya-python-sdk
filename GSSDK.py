@@ -8,15 +8,27 @@ PY_3 = sys.version_info[0] >= 3
 if PY_3:
     import urllib.request
     from urllib.parse import urlencode
+    from urllib.request import build_opener
+    from urllib.request import HTTPHandler
+    from urllib.request import ProxyHandler
+    from urllib.request import install_opener
+    from urllib.request import urlopen
     from http.client import HTTPConnection
     from http.client import HTTPS_PORT
+    from urllib.request import HTTPSHandler
     from urllib.parse import quote_plus
     from urllib.parse import urlparse
 else:
     import urllib2
     from urllib import urlencode
+    from urllib2 import build_opener
+    from urllib2 import HTTPHandler
+    from urllib2 import ProxyHandler
+    from urllib2 import install_opener
+    from urllib2 import urlopen
     from httplib import HTTPConnection
     from httplib import HTTPS_PORT
+    from urllib2 import HTTPSHandler
     from urllib import quote_plus
     from urlparse import urlparse
 

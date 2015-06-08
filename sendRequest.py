@@ -19,19 +19,29 @@ if (debug == None):
 secret = form.getvalue('secret')
 method = form.getvalue('method')
 
-#params = form.getvalue('params')
-
+# params = form.getvalue('params')
 params = {
-	"UID": "_guid_e4WvAOTp8xsl8jmh2lbPHg==",
-	"categoryID": "comments1",
-	"streamID": "~#$%&'()*+,-./:;<=>?_«aZ09»",
-	"commentText": "«utf8-str2»"
+    "UID": "_guid_e4WvAOTp8xsl8jmh2lbPHg==",
+    "categoryID": "comments1",
+    "streamID": "~#$%&'()*+,-./:;<=>?_«aZ09»",
+    "commentText": "«utf8-str2»"
 }
 
 useHttps = form.getvalue('useHttps') == "1" or form.getvalue('useHttps') == "true"
 userKey = form.getvalue('userKey')
 apiDomain = form.getvalue('apiDomain')
 timeout = form.getvalue('timeout')
+
+print("HTTP/1.0 200 OK\n")
+print ("Content-Type: text/html\n\n\n")
+
+req = urlopen("http://en.wikipedia.org/wiki/Python_(programming_language)")
+print(req.read())
+
+install_opener(build_opener())
+
+req = urlopen("https://example.com")
+print(req.read())
 
 req = GSRequest(apiKey, secret, method, params, useHttps, userKey)
 req.setAPIDomain(apiDomain)
@@ -41,8 +51,6 @@ if timeout != None:
 else:
     res = req.send()
 
-# print "HTTP/1.0 200 OK\n";
-# print "Content-Type: text/html\n\n\n";
 print('x-proxy-log:' + res.getLog().replace("\r\n", " "))
 
 if debug:
@@ -57,3 +65,6 @@ if debug:
 else:
     print(res.getResponseText())
 
+# HTTPS will fail if GSRequest didn't restore the urllib's opener
+req = urlopen("https://example.com")
+print(req.read())
