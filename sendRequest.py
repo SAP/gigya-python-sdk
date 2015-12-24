@@ -7,7 +7,7 @@ cgitb.enable()
 # from json import loads as jsonparse
 from GSSDK import *
 
-testUrlOpener = True
+testUrlOpener = False
 
 # Create instance of FieldStorage
 form = cgi.FieldStorage()
@@ -19,15 +19,7 @@ if (debug == None):
     debug = 0
 secret = form.getvalue('secret')
 method = form.getvalue('method')
-
-# params = form.getvalue('params')
-params = {
-    "UID": "_guid_RXg4N8IHxdX1ZxvBUY_pRg==",
-    "categoryID": "comments1",
-    "streamID": "~#$%&'()*+,-./:;<=>?_«aZ09»",
-    "commentText": "«utf8-str2»"
-}
-
+params = form.getvalue('params')
 useHttps = form.getvalue('useHttps') == "1" or form.getvalue('useHttps') == "true"
 userKey = form.getvalue('userKey')
 apiDomain = form.getvalue('apiDomain')
