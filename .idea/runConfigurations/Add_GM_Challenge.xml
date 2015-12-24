@@ -7,13 +7,13 @@
     </envs>
     <option name="SDK_HOME" value="C:\tools\Python27\python.exe" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="IS_MODULE_SDK" value="false" />
+    <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <module name="python" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sendRequest.py" />
-    <option name="PARAMETERS" value="apiKey=3_GAyldJXxCQoXzrKTZJbbK-9nN3XLoxtX1h-_J9M7aE0tTTU_-PhHQ3_3svshj6yT&amp;method=gm.setChallengeConfig&amp;userKey=AJISnE4G6VKi&amp;secret=p2KrA%2B0V%2FGl7htqdtPVCq4XGnM7HyY4X" />
+    <option name="PARAMETERS" value="apiKey=3_GAyldJXxCQoXzrKTZJbbK-9nN3XLoxtX1h-_J9M7aE0tTTU_-PhHQ3_3svshj6yT&amp;method=gm.setChallengeConfig&amp;userKey=AJISnE4G6VKi&amp;secret=p2KrA%2B0V%2FGl7htqdtPVCq4XGnM7HyY4X&amp;params=%7B%0A%20%20%20%20%22challengeID%22%3A%20%22foo%22%2C%0A%20%20%20%20%22levels%22%3A%20%5B%7B%22level%22%3A%201%2C%20%22points%22%3A%20100%7D%5D%0A%7D" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <method />
   </configuration>

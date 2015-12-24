@@ -14,19 +14,22 @@ form = cgi.FieldStorage()
 
 # Get data from fields
 apiKey = form.getvalue('apiKey')
-debug = form.getvalue('debug')
-if (debug == None):
-    debug = 0
 secret = form.getvalue('secret')
 method = form.getvalue('method')
 params = form.getvalue('params')
+
 useHttps = form.getvalue('useHttps') == "1" or form.getvalue('useHttps') == "true"
 userKey = form.getvalue('userKey')
 apiDomain = form.getvalue('apiDomain')
 timeout = form.getvalue('timeout')
 
-print("HTTP/1.0 200 OK\n")
-print ("Content-Type: text/html\n\n\n")
+printHtml = form.getvalue('printHtml')
+if printHtml is None:
+    printHtml = False
+
+if printHtml:
+    print("HTTP/1.0 200 OK\n")
+    print("Content-Type: text/html\n\n\n")
 
 if testUrlOpener:
     req = urlopen("http://en.wikipedia.org/wiki/Python_(programming_language)")
@@ -45,7 +48,7 @@ else:
 
 print('x-proxy-log:' + res.getLog().replace("\r\n", " "))
 
-if debug:
+if printHtml:
     print("<h1>response</h1>")
     print("<textarea style='width:100%;height:300px'>")
     print(res.getResponseText())

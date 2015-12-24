@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publish User Action" type="PythonConfigurationType" factoryName="Python" singleton="true">
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
+    </envs>
+    <option name="SDK_HOME" value="C:\tools\Python27\python.exe" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="IS_MODULE_SDK" value="true" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <module name="python" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sendRequest.py" />
+    <option name="PARAMETERS" value="apiKey=3_GAyldJXxCQoXzrKTZJbbK-9nN3XLoxtX1h-_J9M7aE0tTTU_-PhHQ3_3svshj6yT&amp;method=socialize.publishUserAction&amp;userKey=AJISnE4G6VKi&amp;secret=p2KrA%2B0V%2FGl7htqdtPVCq4XGnM7HyY4X&amp;params=%7B%0A%20%20%20%20%22UID%22%3A%20%22_guid_RXg4N8IHxdX1ZxvBUY_pRg%3D%3D%22%2C%0A%20%20%20%20%22userAction%22%3A%20%7B%0A%20%20%20%20%20%20%20%20%22userMessage%22%3A%20%22Text%20entered%20by%20the%20user%20~%23%24%25%26%27()*%2B%2C-.%2F%3A%3B%3C%3D%3E%3F_%C2%ABaZ09%C2%BB%22%2C%0A%20%20%20%20%20%20%20%20%22title%22%3A%20%22Link%20text%20displayed%20to%20user%22%2C%0A%20%20%20%20%20%20%20%20%22linkBack%22%3A%20%22http%3A%2F%2Fdekel.com%22%2C%0A%20%20%20%20%20%20%20%20%22subtitle%22%3A%20%22%C2%AButf8-str2%C2%BB%22%2C%0A%20%20%20%20%20%20%20%20%22description%22%3A%20%22Description%20of%20the%20link%20displayed%20below%20the%20subtitle%22%2C%0A%20%20%20%20%20%20%20%20%22mediaItems%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7B%22src%22%3A%20%22http%3A%2F%2Fdekel.com%2Flogo.jpg%22%2C%20%22href%22%3A%20%22http%3A%2F%2Fdekel.com%22%2C%20%22type%22%3A%20%22image%22%7D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%7B%22src%22%3A%20%22http%3A%2F%2Fdekel.com%2Fwp-content%2Fimages%2Fcute_cat01.jpg%22%2C%20%22href%22%3A%20%22http%3A%2F%2Fdekel.com%2F%22%2C%20%22type%22%3A%20%22image%22%7D%0A%20%20%20%20%20%20%20%20%5D%0A%20%20%20%20%7D%0A%7D" />
+    <option name="SHOW_COMMAND_LINE" value="false" />
+    <method />
+  </configuration>
+</component>
