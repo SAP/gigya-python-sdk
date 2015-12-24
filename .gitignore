@@ -1,2 +1,7 @@
-.idea/
+# Built application files
 *.pyc
+
+# IntelliJ IDEA
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries/
