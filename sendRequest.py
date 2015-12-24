@@ -7,8 +7,9 @@ cgitb.enable()
 # from json import loads as jsonparse
 from GSSDK import *
 
+testUrlOpener = True
 
-# Create instance of FieldStorage 
+# Create instance of FieldStorage
 form = cgi.FieldStorage()
 
 # Get data from fields
@@ -35,13 +36,12 @@ timeout = form.getvalue('timeout')
 print("HTTP/1.0 200 OK\n")
 print ("Content-Type: text/html\n\n\n")
 
-#req = urlopen("http://en.wikipedia.org/wiki/Python_(programming_language)")
-#print(req.read())
-
-install_opener(build_opener())
-
-#req = urlopen("https://example.com")
-#print(req.read())
+if testUrlOpener:
+    req = urlopen("http://en.wikipedia.org/wiki/Python_(programming_language)")
+    print(req.read())
+    install_opener(build_opener())
+    req = urlopen("https://example.com")
+    print(req.read())
 
 req = GSRequest(apiKey, secret, method, params, useHttps, userKey)
 req.setAPIDomain(apiDomain)
@@ -65,6 +65,7 @@ if debug:
 else:
     print(res.getResponseText())
 
-# HTTPS will fail if GSRequest didn't restore the urllib's opener
-#req = urlopen("https://example.com")
-#print(req.read())
+if testUrlOpener:
+    # HTTPS will fail if GSRequest didn't restore the urllib's opener
+    req = urlopen("https://example.com")
+    print(req.read())
