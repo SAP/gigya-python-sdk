@@ -21,7 +21,7 @@ method = form.getvalue('method')
 
 # params = form.getvalue('params')
 params = {
-    "UID": "_guid_e4WvAOTp8xsl8jmh2lbPHg==",
+    "UID": "_guid_RXg4N8IHxdX1ZxvBUY_pRg==",
     "categoryID": "comments1",
     "streamID": "~#$%&'()*+,-./:;<=>?_«aZ09»",
     "commentText": "«utf8-str2»"
@@ -35,13 +35,13 @@ timeout = form.getvalue('timeout')
 print("HTTP/1.0 200 OK\n")
 print ("Content-Type: text/html\n\n\n")
 
-req = urlopen("http://en.wikipedia.org/wiki/Python_(programming_language)")
-print(req.read())
+#req = urlopen("http://en.wikipedia.org/wiki/Python_(programming_language)")
+#print(req.read())
 
 install_opener(build_opener())
 
-req = urlopen("https://example.com")
-print(req.read())
+#req = urlopen("https://example.com")
+#print(req.read())
 
 req = GSRequest(apiKey, secret, method, params, useHttps, userKey)
 req.setAPIDomain(apiDomain)
@@ -66,5 +66,5 @@ else:
     print(res.getResponseText())
 
 # HTTPS will fail if GSRequest didn't restore the urllib's opener
-req = urlopen("https://example.com")
-print(req.read())
+#req = urlopen("https://example.com")
+#print(req.read())
