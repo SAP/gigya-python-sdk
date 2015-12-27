@@ -7,7 +7,6 @@ PY_3 = sys.version_info[0] >= 3
 
 if PY_3:
     import urllib.request
-    from urllib.parse import urlencode
     from urllib.request import build_opener
     from urllib.request import HTTPHandler
     from urllib.request import ProxyHandler
@@ -20,7 +19,6 @@ if PY_3:
     from urllib.parse import urlparse
 else:
     import urllib2
-    from urllib import urlencode
     from urllib2 import build_opener
     from urllib2 import HTTPHandler
     from urllib2 import ProxyHandler
@@ -42,6 +40,7 @@ import ssl
 from hashlib import sha1
 from base64 import b64decode, b64encode
 from json import loads as jsonparse
+from json import dumps as jsonstringify
 from re import search
 from random import randrange
 
@@ -51,21 +50,6 @@ if PY_3:
 else:
     string_types = basestring
     integer_types = (int, long)
-
-
-def encoded_dict(in_dict):
-    if PY_3:
-        return in_dict
-
-    out_dict = {}
-    for k, v in in_dict.iteritems():
-        if isinstance(v, unicode):
-            v = v.encode('utf-8')
-        elif isinstance(v, str):
-            v.decode('utf-8')
-        out_dict[k] = v
-
-    return out_dict
 
 
 class GSException(Exception):
@@ -233,7 +217,8 @@ class GSRequest():
 
     def curl(self, url, params=None, timeout=None):
 
-        queryString = urlencode(encoded_dict(params))
+        queryString = self.buildQS(params)
+
 
         self.traceField("URL", url)
         self.traceField("postData", queryString)
@@ -322,8 +307,12 @@ class GSRequest():
         elif isinstance(value, integer_types):
             return str(value)
         else:
-            S = quote_plus(value.encode('utf-8'))
-            return S.replace("+", "%20").replace("%7E", "~")
+            if isinstance(value, dict) or isinstance(value, list):
+                str_value = jsonstringify(value)
+            else:
+                str_value = value.encode('utf-8')
+
+            return quote_plus(str_value).replace("+", "%20").replace("%7E", "~")
 
     def traceField(self, name, value):
         if value:
