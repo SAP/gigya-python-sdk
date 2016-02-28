@@ -62,7 +62,7 @@ class GSException(Exception):
 
 class GSRequest():
     DEFAULT_API_DOMAIN = "us1.gigya.com"
-    VERSION = "2.17"
+    VERSION = "3.3.0"
     caCertsPath = os.path.join(os.path.dirname(__file__), "cacert.pem")
 
     _domain = ""
