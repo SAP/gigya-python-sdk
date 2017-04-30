@@ -473,7 +473,17 @@ class SigUtils():
         unsignedExpString = gltCookie + "_" + expirationTimeUnixString
         signedExpString = SigUtils.calcSignature(unsignedExpString, secret)
 
-        ret = expirationTimeUnixString + '_' + signedExpString
+        ret = expirationTimeUnixString + "_" + signedExpString
+        return ret
+
+    @staticmethod
+    def getDynamicSessionSignatureUserSigned(gltCookie, timeoutInSeconds, userKey, secret):
+        expirationTimeUnixMS = calendar.timegm(time.gmtime()) + timeoutInSeconds
+        expirationTimeUnixString = str(expirationTimeUnixMS)
+        unsignedExpString = gltCookie + "_" + expirationTimeUnixString + "_" + userKey
+        signedExpString = SigUtils.calcSignature(unsignedExpString, secret)
+
+        ret = expirationTimeUnixString + "_" + userKey + "_" + signedExpString
         return ret
 
     @staticmethod
