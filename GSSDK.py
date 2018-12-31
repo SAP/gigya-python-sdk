@@ -62,7 +62,7 @@ class GSException(Exception):
 
 class GSRequest():
     DEFAULT_API_DOMAIN = "us1.gigya.com"
-    VERSION = "3.3.0"
+    VERSION = "3.3.1"
     caCertsPath = os.path.join(os.path.dirname(__file__), "cacert.pem")
 
     _domain = ""
@@ -261,7 +261,7 @@ class GSRequest():
         keys.sort()
         for key in keys:
             value = params.get(key)
-            if value:
+            if value is not None:
                 queryString += amp + key + "=" + self.UrlEncode(value)
                 amp = "&"
 
@@ -302,7 +302,7 @@ class GSRequest():
         return baseString
 
     def UrlEncode(self, value):
-        if not value:
+        if value is None:
             return value
         elif isinstance(value, integer_types):
             return str(value)
