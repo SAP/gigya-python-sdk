@@ -36,6 +36,7 @@ import calendar
 import socket
 import os
 import ssl
+import copy 
 
 from hashlib import sha1
 from base64 import b64decode, b64encode
@@ -100,7 +101,7 @@ class GSRequest():
         if params is None:
             self._params = {}
         elif isinstance(params, dict):
-            self._params = params
+            self._params = copy.copy(params)
         elif isinstance(params, string_types):
             self._params = jsonparse(params, encoding='utf-8')
         else:
