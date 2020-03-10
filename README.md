@@ -1,4 +1,4 @@
-# Gigya SDK for Python
+# Gigya SDK for Python 
 Learn more: https://developers.gigya.com/display/GD/Python
 
 ## Description
