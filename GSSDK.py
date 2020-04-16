@@ -63,7 +63,7 @@ class GSException(Exception):
 
 class GSRequest():
     DEFAULT_API_DOMAIN = "us1.gigya.com"
-    VERSION = "3.3.3"
+    VERSION = "3.3.4"
     caCertsPath = os.path.join(os.path.dirname(__file__), "cacert.pem")
 
     _domain = ""
@@ -455,6 +455,7 @@ class ValidHTTPSHandler(HTTPSHandler):
 
 
 class SigUtils():
+
     @staticmethod
     def validateUserSignature(UID, timestamp, secret, signature):
         baseString = timestamp + "_" + UID
@@ -462,10 +463,22 @@ class SigUtils():
         return expectedSig == signature
 
     @staticmethod
+    def validateUserSignatureWithExpiration(UID, timestamp, secret, signature, expiration):
+        expired = SigUtils.signatureTimestampExpired(timestamp, expiration)
+        signatureValidated = SigUtils.validateUserSignature(UID, timestamp, secret, signature)
+        return not expired and signatureValidated 
+
+    @staticmethod
     def validateFriendSignature(UID, timestamp, friendUID, secret, signature):
         baseString = timestamp + "_" + friendUID + "_" + UID
         expectedSig = SigUtils.calcSignature(baseString, secret)
         return expectedSig == signature
+
+    @staticmethod
+    def validateFriendSignatureWithEx(UID, timestamp, friendUID, secret, signature, expiration):
+        expired = SigUtils.signatureTimestampExpired(timestamp, expiration)
+        signatureValidated = SigUtils.validateFriendSignature(UID, timestamp, friendUID, secret, signature)
+        return not expired and signatureValidated
 
     @staticmethod
     def getDynamicSessionSignature(gltCookie, timeoutInSeconds, secret):
@@ -500,3 +513,13 @@ class SigUtils():
     @staticmethod
     def currentTimeMillis():
         return int(round(time.time() * 1000))
+
+    @staticmethod
+    def signatureTimestampExpired(signatureTimestampExpired, expiration):
+        now = int(round(time.time()))
+        timestamp = int(signatureTimestampExpired)
+        return abs(now - timestamp) > expiration
+
+
+
+
