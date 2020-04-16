@@ -475,7 +475,7 @@ class SigUtils():
         return expectedSig == signature
 
     @staticmethod
-    def validateFriendSignatureWithEx(UID, timestamp, friendUID, secret, signature, expiration):
+    def validateFriendSignatureWithExpiration(UID, timestamp, friendUID, secret, signature, expiration):
         expired = SigUtils.signatureTimestampExpired(timestamp, expiration)
         signatureValidated = SigUtils.validateFriendSignature(UID, timestamp, friendUID, secret, signature)
         return not expired and signatureValidated
