@@ -457,10 +457,14 @@ class ValidHTTPSHandler(HTTPSHandler):
 class SigUtils():
 
     @staticmethod
-    def validateUserSignature(UID, timestamp, secret, signature):
+    def validateUserSignature(UID, timestamp, secret, signature, expiration=None):
         baseString = timestamp + "_" + UID
         expectedSig = SigUtils.calcSignature(baseString, secret)
-        return expectedSig == signature
+        if expiration is None:
+            return expectedSig == signature
+        else:
+            expired = SigUtils.signatureTimestampExpired(timestamp, expiration)
+            return not expired and expectedSig == signature
 
     @staticmethod
     def validateUserSignatureWithExpiration(UID, timestamp, secret, signature, expiration):
@@ -469,10 +473,14 @@ class SigUtils():
         return not expired and signatureValidated 
 
     @staticmethod
-    def validateFriendSignature(UID, timestamp, friendUID, secret, signature):
+    def validateFriendSignature(UID, timestamp, friendUID, secret, signature, expiration=None):
         baseString = timestamp + "_" + friendUID + "_" + UID
         expectedSig = SigUtils.calcSignature(baseString, secret)
-        return expectedSig == signature
+        if expiration is None:
+            return expectedSig == signature
+        else:
+            expired = SigUtils.signatureTimestampExpired(timestamp, expiration)
+            return not expired and expectedSig == signature 
 
     @staticmethod
     def validateFriendSignatureWithExpiration(UID, timestamp, friendUID, secret, signature, expiration):
