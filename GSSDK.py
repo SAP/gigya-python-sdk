@@ -455,6 +455,7 @@ class ValidHTTPSHandler(HTTPSHandler):
 
 
 class SigUtils():
+
     @staticmethod
     def validateUserSignature(UID, timestamp, secret, signature):
         baseString = timestamp + "_" + UID
@@ -462,10 +463,22 @@ class SigUtils():
         return expectedSig == signature
 
     @staticmethod
+    def validateUserSignatureWithExpiration(UID, timestamp, secret, signature, expiration):
+        expired = SigUtils.signatureTimestampExpired(timestamp, expiration)
+        signatureValidated = SigUtils.validateUserSignature(UID, timestamp, secret, signature)
+        return not expired and signatureValidated 
+
+    @staticmethod
     def validateFriendSignature(UID, timestamp, friendUID, secret, signature):
         baseString = timestamp + "_" + friendUID + "_" + UID
         expectedSig = SigUtils.calcSignature(baseString, secret)
         return expectedSig == signature
+
+    @staticmethod
+    def validateFriendSignatureWithExpiration(UID, timestamp, friendUID, secret, signature, expiration):
+        expired = SigUtils.signatureTimestampExpired(timestamp, expiration)
+        signatureValidated = SigUtils.validateFriendSignature(UID, timestamp, friendUID, secret, signature)
+        return not expired and signatureValidated
 
     @staticmethod
     def getDynamicSessionSignature(gltCookie, timeoutInSeconds, secret):
@@ -498,3 +511,13 @@ class SigUtils():
     @staticmethod
     def currentTimeMillis():
         return int(round(time.time() * 1000))
+
+    @staticmethod
+    def signatureTimestampExpired(signatureTimestampExpired, expiration):
+        now = int(round(time.time()))
+        timestamp = int(signatureTimestampExpired)
+        return abs(now - timestamp) > expiration
+
+
+
+
