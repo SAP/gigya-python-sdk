@@ -6,3 +6,5 @@
 .idea/tasks.xml
 .idea/dictionaries/
 .DS_Store
+
+getUserInfo.py
