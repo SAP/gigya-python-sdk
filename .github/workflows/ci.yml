@@ -30,4 +30,4 @@ jobs:
           pipenv install --dev
       - name: Test 
         run: |
-          pipenv run test
+          pipenv run python SigUtilsTest.py
