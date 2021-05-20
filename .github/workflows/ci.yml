@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9]
 
     steps:
       - uses: actions/checkout@v2
@@ -16,11 +16,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Instal pyenv
-        uses: gabrielfalcao/pyenv-action@v5
-        with:
-          default: "${{ matrix.python }}"
-          command: python -m pip install --upgrade pipenv wheel  # upgrade pip after installing python
+      - name: Install pipenv
+        run: |
+          python -m pip install --upgrade pipenv wheel
       - id: cache-pipenv
         uses: actions/cache@v1
         with:
