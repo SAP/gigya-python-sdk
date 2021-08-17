@@ -1,6 +1,8 @@
 # Python SDK 
 *SAP Customer Data Cloud (Gigya)* 
 
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP/gigya-python-sdk)](https://api.reuse.software/info/github.com/SAP/gigya-python-sdk)
+
 ### Description
 The Python SDK provides a Python interface 
 for the Gigya API. The library makes it simple to integrate Gigya services 
@@ -13,7 +15,7 @@ and use the [Library Reference](https://help.sap.com/viewer/DRAFT/8b8d6fffe11345
 Note: Python 2.7.x and 3 are supported.
 ```
 
-##Library Guide
+## Library Guide
 
 Please follow these steps to integrate this library in your Python application:
 
@@ -50,7 +52,7 @@ To learn more about the login process, see [Social Login](https://help.sap.com/v
 
 [LoginDiagram]: https://help.sap.com/doc/DRAFT/8b8d6fffe113457094a17701f63e3d6a/GIGYA/en-US/loio40c2081f70b21014bbc5a10ce4041860_LowRes.gif "Login Diagram"
 
-###Sending a Request
+### Sending a Request
 After you have logged in the user, you may use the GSRequest class to access the user profile and perform various activities. This is implemented using GSRequest's send method. The following code sends a request to set the current user's status to "I feel great":
 
 ```python
@@ -230,3 +232,7 @@ params = {"userAction":userAction, "uid":"PUT-UID-HERE"}
 request = GSRequest("PUT-YOUR-APIKEY-HERE", "PUT-YOUR-SECRET-KEY-HERE", "socialize.publishUserAction", params)
 response = request.send()
 ```
+
+## Licensing
+
+Copyright 2020-2021 SAP SE or an SAP affiliate company and gigya-python-sdk contributors. Please see our LICENSE(LICENSE.txt) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/SAP/gigya-python-sdk).
