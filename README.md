@@ -1,20 +1,18 @@
 # Python SDK 
-*SAP Customer Data Cloud (Gigya)* 
+[Learn more](https://help.sap.com/viewer/DRAFT/8b8d6fffe113457094a17701f63e3d6a/GIGYA/en-US/416a660e70b21014bbc5a10ce4041860.html)
 
 ### Description
-The Python SDK provides a Python interface 
-for the Gigya API. The library makes it simple to integrate Gigya services 
-in your Python application. This document is a practical step-by-step guide 
-for programmers who wish to integrate the Gigya service into their Python 
-application. Follow the steps below to get started, 
-and use the [Library Reference](https://help.sap.com/viewer/DRAFT/8b8d6fffe113457094a17701f63e3d6a/GIGYA/en-US/416a3f1f70b21014bbc5a10ce4041860.html) while implementing.
+The Python SDK provides a Python interface for the Gigya API. 
+The library makes it simple to integrate Gigya services in your Python application. 
+This document is a practical step-by-step guide for programmers who wish to integrate the Gigya service into their Python application. 
+Follow the steps below to get started and use the [Library Reference](https://help.sap.com/viewer/DRAFT/8b8d6fffe113457094a17701f63e3d6a/GIGYA/en-US/416a3f1f70b21014bbc5a10ce4041860.html) while implementing.
+
+## Requirements
+[Pyhton](https://www.python.org/downloads/) 
 
 ```
 Note: Python 2.7.x and 3 are supported.
 ```
-
-## Requirements
-[Pyhton](https://www.python.org/downloads/) 
 
 ## Download and Installation
 * Clone the repo.
@@ -23,7 +21,7 @@ Note: Python 2.7.x and 3 are supported.
 
 Please follow these steps to integrate this library in your Python application:
 
-1. Download the zip file and extract it
+1. Download the zip file and extract it.
 2. Obtain Gigya's APIKey and Secret key.
 3. Import GSSDK.py library into your application.
 4. Log the user in.
@@ -236,10 +234,19 @@ params = {"userAction":userAction, "uid":"PUT-UID-HERE"}
 request = GSRequest("PUT-YOUR-APIKEY-HERE", "PUT-YOUR-SECRET-KEY-HERE", "socialize.publishUserAction", params)
 response = request.send()
 ```
+## Limitations
+None
+
+## Known Issues
+None
 
 ## How to obtain support
-Via SAP standard support.
-https://developers.gigya.com/display/GD/Opening+A+Support+Incident
+[Learn more] (https://help.sap.com/viewer/8b8d6fffe113457094a17701f63e3d6a/GIGYA/en-US/4167e8a470b21014bbc5a10ce4041860.html)
 
+## Contributing
+Via pull request to this repository.
+
+## To-Do (upcoming changes)
+None
 
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/gigya-python-sdk)](https://api.reuse.software/info/github.com/SAP/gigya-python-sdk)
