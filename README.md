@@ -54,7 +54,7 @@ To learn more about the login process, see [Social Login](https://help.sap.com/v
 
 [LoginDiagram]: https://help.sap.com/doc/DRAFT/8b8d6fffe113457094a17701f63e3d6a/GIGYA/en-US/loio40c2081f70b21014bbc5a10ce4041860_LowRes.gif "Login Diagram"
 
-###Sending a Request
+### Sending a Request
 After you have logged in the user, you may use the GSRequest class to access the user profile and perform various activities. This is implemented using GSRequest's send method. The following code sends a request to set the current user's status to "I feel great":
 
 ```python
