@@ -17,7 +17,7 @@ Note: Python 2.7.x and 3 are supported.
 ## Download and Installation
 * Clone the repo.
 
-##Library Guide
+## Library Guide
 
 Please follow these steps to integrate this library in your Python application:
 
