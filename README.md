@@ -230,3 +230,4 @@ params = {"userAction":userAction, "uid":"PUT-UID-HERE"}
 request = GSRequest("PUT-YOUR-APIKEY-HERE", "PUT-YOUR-SECRET-KEY-HERE", "socialize.publishUserAction", params)
 response = request.send()
 ```
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP/gigya-python-sdk)](https://api.reuse.software/info/github.com/SAP/gigya-python-sdk)
