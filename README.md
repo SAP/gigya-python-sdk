@@ -13,6 +13,12 @@ and use the [Library Reference](https://help.sap.com/viewer/DRAFT/8b8d6fffe11345
 Note: Python 2.7.x and 3 are supported.
 ```
 
+## Requirements
+[Pyhton](https://www.python.org/downloads/) 
+
+## Download and Installation
+* Clone the repo.
+
 ##Library Guide
 
 Please follow these steps to integrate this library in your Python application:
@@ -230,4 +236,10 @@ params = {"userAction":userAction, "uid":"PUT-UID-HERE"}
 request = GSRequest("PUT-YOUR-APIKEY-HERE", "PUT-YOUR-SECRET-KEY-HERE", "socialize.publishUserAction", params)
 response = request.send()
 ```
+
+## How to obtain support
+Via SAP standard support.
+https://developers.gigya.com/display/GD/Opening+A+Support+Incident
+
+
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/gigya-python-sdk)](https://api.reuse.software/info/github.com/SAP/gigya-python-sdk)
