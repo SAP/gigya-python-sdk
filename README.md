@@ -241,4 +241,5 @@ response = request.send()
 Via SAP standard support.
 https://developers.gigya.com/display/GD/Opening+A+Support+Incident
 
+
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/gigya-python-sdk)](https://api.reuse.software/info/github.com/SAP/gigya-python-sdk)
