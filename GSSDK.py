@@ -3,7 +3,12 @@
 from __future__ import unicode_literals
 import sys
 
-PY_3 = sys.version_info[0] >= 3
+MAJOR_VERSION_INDEX = 0
+MINOR_VERSION_INDEX = 1
+
+PY_3 = sys.version_info[MAJOR_VERSION_INDEX] >= 3
+
+PY_3_9_OR_GREATER = PY_3 and sys.version_info[MINOR_VERSION_INDEX] >= 9
 
 if PY_3:
     import urllib.request
@@ -40,7 +45,7 @@ import copy
 
 from hashlib import sha1
 from base64 import b64decode, b64encode
-from json import loads as jsonparse
+from json import loads
 from json import dumps as jsonstringify
 from re import search
 from random import randrange
@@ -103,7 +108,7 @@ class GSRequest():
         elif isinstance(params, dict):
             self._params = copy.copy(params)
         elif isinstance(params, string_types):
-            self._params = jsonparse(params, encoding='utf-8')
+            self._params = Utils.jsonparse(params)
         else:
             self._params = dict([k, v.encode('utf-8')] for k, v in params.items())
 
@@ -386,7 +391,7 @@ class GSResponse():
             self.rawData = responseText.encode('utf-8')
 
             if (responseText.lstrip().find('{') != -1):
-                self.data = jsonparse(responseText, encoding='utf-8')
+                self.data = Utils.jsonparse(responseText)
 
                 if self.data:
                     self.errorCode = self.data.get("errorCode")
@@ -526,6 +531,12 @@ class SigUtils():
         timestamp = int(signatureTimestampExpired)
         return abs(now - timestamp) > expiration
 
+class Utils():
 
-
+    @staticmethod
+    def jsonparse(source):
+        if PY_3_9_OR_GREATER:
+            return loads(source)
+        else:
+            return loads(source, encoding='utf-8')
 
