@@ -452,7 +452,10 @@ class ValidHTTPSConnection(HTTPConnection):
         if self._tunnel_host:
             self.sock = sock
             self._tunnel()
-        self.sock = ssl.wrap_socket(sock, ca_certs=GSRequest.caCertsPath, cert_reqs=ssl.CERT_REQUIRED)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        context.verify_mode = ssl.CERT_REQUIRED
+        context.load_verify_locations(GSRequest.caCertsPath)
+        self.sock = context.wrap_socket(sock)
 
 class ValidHTTPSHandler(HTTPSHandler):
     def https_open(self, req):
