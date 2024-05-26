@@ -5,13 +5,13 @@
 The Python SDK provides a Python interface for the Gigya API. 
 The library makes it simple to integrate Gigya services in your Python application. 
 This document is a practical step-by-step guide for programmers who wish to integrate the Gigya service into their Python application. 
-Follow the steps below to get started and use the [Library Reference](https://help.sap.com/viewer/DRAFT/8b8d6fffe113457094a17701f63e3d6a/GIGYA/en-US/416a3f1f70b21014bbc5a10ce4041860.html) while implementing.
+Follow the steps below to get started and use the [Library Reference](https://help.sap.com/docs/SAP_CUSTOMER_DATA_CLOUD/8b8d6fffe113457094a17701f63e3d6a/416a3f1f70b21014bbc5a10ce4041860.html?q=python%20sdk) while implementing.
 
 ## Requirements
-[Pyhton](https://www.python.org/downloads/) 
+[Python](https://www.python.org/downloads/) 
 
 ```
-Note: Python 2.7.x and 3 are supported.
+Note: Python version 3.x is supported.
 ```
 
 ## Download and Installation
