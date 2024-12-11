@@ -95,6 +95,7 @@ class GSRequest():
          @param params the request parameters
          @param useHTTPS useHTTPS set this to true if you want to use HTTPS.
          @param userKey A key of an admin user with extra permissions.
+         @param enable_host_check Hostcheck can be disabled by passing enable_host_check=false when using HTTPS. Can be necessary when using proxy. Default is True
          If this parameter is provided, then the secretKey parameter is assumed to be the admin user's secret key and not the site's secret key.
         """
 
@@ -234,7 +235,7 @@ class GSRequest():
         if self._proxy:
             opener = build_opener(
                 HTTPHandler(),
-                ValidHTTPSHandler(enable_host_check),
+                ValidHTTPSHandler(enable_host_check), # maybe always send False???
                 ProxyHandler({proto: self._proxy}))
         else:
             opener = build_opener(
