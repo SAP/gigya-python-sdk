@@ -17,7 +17,7 @@ if PY_3:
     from urllib.request import ProxyHandler
     from urllib.request import install_opener
     from urllib.request import urlopen
-    from http.client import HTTPConnection
+    from http.client import HTTPSConnection
     from http.client import HTTPS_PORT
     from urllib.request import HTTPSHandler
     from urllib.parse import quote_plus
@@ -29,7 +29,7 @@ else:
     from urllib2 import ProxyHandler
     from urllib2 import install_opener
     from urllib2 import urlopen
-    from httplib import HTTPConnection
+    from httplib import HTTPSConnection
     from httplib import HTTPS_PORT
     from urllib2 import HTTPSHandler
     from urllib import quote_plus
@@ -41,7 +41,7 @@ import calendar
 import socket
 import os
 import ssl
-import copy 
+import copy
 
 from hashlib import sha1
 from base64 import b64decode, b64encode
@@ -68,7 +68,7 @@ class GSException(Exception):
 
 class GSRequest():
     DEFAULT_API_DOMAIN = "us1.gigya.com"
-    VERSION = "3.5.0"
+    VERSION = "3.5.1"
     caCertsPath = os.path.join(os.path.dirname(__file__), "cacert.pem")
 
     _domain = ""
@@ -85,7 +85,7 @@ class GSRequest():
     _useHTTPS = False
     _apiDomain = DEFAULT_API_DOMAIN
 
-    def __init__(self, apiKey=None, secretKey=None, apiMethod=None, params=None, useHTTPS=False, userKey=None):
+    def __init__(self, apiKey=None, secretKey=None, apiMethod=None, params=None, useHTTPS=False, userKey=None, enable_host_check=True):
         """
          Constructs a request using the apiKey and secretKey.
          @param apiKey
@@ -95,6 +95,7 @@ class GSRequest():
          @param params the request parameters
          @param useHTTPS useHTTPS set this to true if you want to use HTTPS.
          @param userKey A key of an admin user with extra permissions.
+         @param enable_host_check Hostcheck can be disabled by passing enable_host_check=false when using HTTPS. Can be necessary when using proxy. Default is True
          If this parameter is provided, then the secretKey parameter is assumed to be the admin user's secret key and not the site's secret key.
         """
 
@@ -118,6 +119,7 @@ class GSRequest():
         self._secretKey = secretKey
         self._userKey = userKey
         self._traceLog = list()
+        self._enableHostCheck = enable_host_check
         self.traceField("apiMethod", apiMethod)
         self.traceField("apiKey", apiKey)
 
@@ -188,7 +190,7 @@ class GSRequest():
 
             return GSResponse(self._method, None, self._params, errCode, errMsg, self._traceLog)
 
-    def sendRequest(self, httpMethod, domain, path, params, token, secret=None, useHTTPS=False, timeout=None, userKey=None):
+    def sendRequest(self, httpMethod, domain, path, params, token, secret=None, useHTTPS=False, timeout=None, userKey=None, enable_host_check=True):
 
         params["sdk"] = "python_" + self.VERSION
         # prepare query params
@@ -216,15 +218,14 @@ class GSRequest():
             params["oauth_token"] = token
 
         # get rest response.
-        res = self.curl(resourceURI, params, timeout)
+        res = self.curl(resourceURI, params, timeout, enable_host_check)
 
         return res
 
 
-    def curl(self, url, params=None, timeout=None):
+    def curl(self, url, params=None, timeout=None, enable_host_check=True):
 
         queryString = self.buildQS(params)
-
 
         self.traceField("URL", url)
         self.traceField("postData", queryString)
@@ -234,12 +235,12 @@ class GSRequest():
         if self._proxy:
             opener = build_opener(
                 HTTPHandler(),
-                ValidHTTPSHandler(),
+                ValidHTTPSHandler(enable_host_check), # maybe always send False???
                 ProxyHandler({proto: self._proxy}))
         else:
             opener = build_opener(
                 HTTPHandler(),
-                ValidHTTPSHandler())
+                ValidHTTPSHandler(enable_host_check))
 
         queryString = queryString.encode('utf-8')
 
@@ -440,11 +441,12 @@ class GSResponse():
         return sb
 
 
-class ValidHTTPSConnection(HTTPConnection):
+class ValidHTTPSConnection(HTTPSConnection):
     default_port = HTTPS_PORT
 
     def __init__(self, *args, **kwargs):
-        HTTPConnection.__init__(self, *args, **kwargs)
+        HTTPSConnection.__init__(self, *args, **kwargs)
+        self._context = kwargs.get('context')
 
     def connect(self):
         sock = socket.create_connection((self.host, self.port), self.timeout, self.source_address)
@@ -453,18 +455,28 @@ class ValidHTTPSConnection(HTTPConnection):
             self.sock = sock
             self._tunnel()
 
-        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-        context.minumum_version = ssl.TLSVersion.TLSv1_2
-        context.load_verify_locations(GSRequest.caCertsPath)
-        context.verify_mode = ssl.CERT_REQUIRED
-        context.check_hostname = True
-
-        self.sock = context.wrap_socket(sock, server_hostname=self.host)
+        self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
 
 
 class ValidHTTPSHandler(HTTPSHandler):
+    def __init__(self, enable_host_check=True):
+        super().__init__()
+        self._enableHostCheck = enable_host_check
+
     def https_open(self, req):
-        return self.do_open(ValidHTTPSConnection, req)
+        return self.do_open(self.get_connection, req)
+
+    def get_connection(self, host, timeout):
+        return ValidHTTPSConnection(host, timeout = timeout, context = self.create_context())
+
+    def create_context(self):
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        context.load_verify_locations(GSRequest.caCertsPath)
+        context.verify_mode = ssl.CERT_REQUIRED
+        context.check_hostname = self._enableHostCheck
+
+        return context
 
 
 class SigUtils():
@@ -483,7 +495,7 @@ class SigUtils():
     def validateUserSignatureWithExpiration(UID, timestamp, secret, signature, expiration):
         expired = SigUtils.signatureTimestampExpired(timestamp, expiration)
         signatureValidated = SigUtils.validateUserSignature(UID, timestamp, secret, signature)
-        return not expired and signatureValidated 
+        return not expired and signatureValidated
 
     @staticmethod
     def validateFriendSignature(UID, timestamp, friendUID, secret, signature, expiration=None):
@@ -493,7 +505,7 @@ class SigUtils():
             return expectedSig == signature
         else:
             expired = SigUtils.signatureTimestampExpired(timestamp, expiration)
-            return not expired and expectedSig == signature 
+            return not expired and expectedSig == signature
 
     @staticmethod
     def validateFriendSignatureWithExpiration(UID, timestamp, friendUID, secret, signature, expiration):
