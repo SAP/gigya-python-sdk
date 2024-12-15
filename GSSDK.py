@@ -68,7 +68,7 @@ class GSException(Exception):
 
 class GSRequest():
     DEFAULT_API_DOMAIN = "us1.gigya.com"
-    VERSION = "3.5.1"
+    VERSION = "3.5.2"
     caCertsPath = os.path.join(os.path.dirname(__file__), "cacert.pem")
 
     _domain = ""
@@ -175,7 +175,7 @@ class GSRequest():
             self.traceField("params", self._params)
             self.traceField("useHTTPS", self._useHTTPS)
             self.traceField("userKey", self._userKey)
-            responseStr = self.sendRequest("POST", self._host, self._path, self._params, self._apiKey, self._secretKey, self._useHTTPS, timeout, self._userKey)
+            responseStr = self.sendRequest("POST", self._host, self._path, self._params, self._apiKey, self._secretKey, self._useHTTPS, timeout, self._userKey, self._enableHostCheck)
 
             return GSResponse(self._method, responseStr, None, 0, None, self._traceLog)
 
