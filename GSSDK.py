@@ -85,7 +85,7 @@ class GSRequest():
     _useHTTPS = False
     _apiDomain = DEFAULT_API_DOMAIN
 
-    def __init__(self, apiKey=None, secretKey=None, apiMethod=None, params=None, useHTTPS=False, userKey=None, enable_host_check=True):
+    def __init__(self, apiKey=None, secretKey=None, apiMethod=None, params=None, useHTTPS=False, userKey=None):
         """
          Constructs a request using the apiKey and secretKey.
          @param apiKey
@@ -95,7 +95,6 @@ class GSRequest():
          @param params the request parameters
          @param useHTTPS useHTTPS set this to true if you want to use HTTPS.
          @param userKey A key of an admin user with extra permissions.
-         @param enable_host_check Hostcheck can be disabled by passing enable_host_check=false when using HTTPS. Can be necessary when using proxy. Default is True
          If this parameter is provided, then the secretKey parameter is assumed to be the admin user's secret key and not the site's secret key.
         """
 
@@ -119,7 +118,6 @@ class GSRequest():
         self._secretKey = secretKey
         self._userKey = userKey
         self._traceLog = list()
-        self._enableHostCheck = enable_host_check
         self.traceField("apiMethod", apiMethod)
         self.traceField("apiKey", apiKey)
 
@@ -175,7 +173,7 @@ class GSRequest():
             self.traceField("params", self._params)
             self.traceField("useHTTPS", self._useHTTPS)
             self.traceField("userKey", self._userKey)
-            responseStr = self.sendRequest("POST", self._host, self._path, self._params, self._apiKey, self._secretKey, self._useHTTPS, timeout, self._userKey, self._enableHostCheck)
+            responseStr = self.sendRequest("POST", self._host, self._path, self._params, self._apiKey, self._secretKey, self._useHTTPS, timeout, self._userKey)
 
             return GSResponse(self._method, responseStr, None, 0, None, self._traceLog)
 
@@ -190,7 +188,7 @@ class GSRequest():
 
             return GSResponse(self._method, None, self._params, errCode, errMsg, self._traceLog)
 
-    def sendRequest(self, httpMethod, domain, path, params, token, secret=None, useHTTPS=False, timeout=None, userKey=None, enable_host_check=True):
+    def sendRequest(self, httpMethod, domain, path, params, token, secret=None, useHTTPS=False, timeout=None, userKey=None):
 
         params["sdk"] = "python_" + self.VERSION
         # prepare query params
@@ -218,12 +216,12 @@ class GSRequest():
             params["oauth_token"] = token
 
         # get rest response.
-        res = self.curl(resourceURI, params, timeout, enable_host_check)
+        res = self.curl(resourceURI, params, timeout)
 
         return res
 
 
-    def curl(self, url, params=None, timeout=None, enable_host_check=True):
+    def curl(self, url, params=None, timeout=None):
 
         queryString = self.buildQS(params)
 
@@ -235,12 +233,12 @@ class GSRequest():
         if self._proxy:
             opener = build_opener(
                 HTTPHandler(),
-                ValidHTTPSHandler(enable_host_check), # maybe always send False???
+                ValidHTTPSHandler(False),
                 ProxyHandler({proto: self._proxy}))
         else:
             opener = build_opener(
                 HTTPHandler(),
-                ValidHTTPSHandler(enable_host_check))
+                ValidHTTPSHandler())
 
         queryString = queryString.encode('utf-8')
 
