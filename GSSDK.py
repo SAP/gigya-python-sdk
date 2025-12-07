@@ -84,8 +84,10 @@ class GSRequest():
     _params = {}
     _useHTTPS = False
     _apiDomain = DEFAULT_API_DOMAIN
+    _certFile = None
+    _keyFile = None
 
-    def __init__(self, apiKey=None, secretKey=None, apiMethod=None, params=None, useHTTPS=False, userKey=None):
+    def __init__(self, apiKey=None, secretKey=None, apiMethod=None, params=None, useHTTPS=False, userKey=None, certFile=None, keyFile=None):
         """
          Constructs a request using the apiKey and secretKey.
          @param apiKey
@@ -96,6 +98,8 @@ class GSRequest():
          @param useHTTPS useHTTPS set this to true if you want to use HTTPS.
          @param userKey A key of an admin user with extra permissions.
          If this parameter is provided, then the secretKey parameter is assumed to be the admin user's secret key and not the site's secret key.
+         @param certFile Path to client certificate file (string) or certificate content (bytes) for mTLS authentication
+         @param keyFile Path to client private key file (string) or key content (bytes) for mTLS authentication
         """
 
         if apiMethod is None:
@@ -117,6 +121,8 @@ class GSRequest():
         self._apiKey = apiKey
         self._secretKey = secretKey
         self._userKey = userKey
+        self._certFile = certFile
+        self._keyFile = keyFile
         self._traceLog = list()
         self.traceField("apiMethod", apiMethod)
         self.traceField("apiKey", apiKey)
@@ -136,6 +142,12 @@ class GSRequest():
     def setProxy(self, proxy):
         self._proxy = proxy
         self.traceField("proxy", proxy)
+
+    def _has_mtls_config(self):
+        """
+        Check if mTLS configuration is provided.
+        """
+        return self._certFile is not None and self._keyFile is not None
 
     def send(self, timeout=None):
         """Send the request synchronously"""
@@ -160,7 +172,7 @@ class GSRequest():
             timeout = float(timeout)
             self.traceField("timeout", timeout)
 
-        if (self._method is None or (self._apiKey is None and self._userKey is None)):
+        if (self._method is None or (self._apiKey is None and self._userKey is None and not self._has_mtls_config())):
             return GSResponse(self._method, None, self._params, 400002, None, self._traceLog)
 
         if (self._useHTTPS and not os.path.isfile(GSRequest.caCertsPath)):
@@ -233,12 +245,12 @@ class GSRequest():
         if self._proxy:
             opener = build_opener(
                 HTTPHandler(),
-                ValidHTTPSHandler(False),
+                ValidHTTPSHandler(SSLUtils.createSSLContext(False, self._certFile, self._keyFile)),
                 ProxyHandler({proto: self._proxy}))
         else:
             opener = build_opener(
                 HTTPHandler(),
-                ValidHTTPSHandler())
+                ValidHTTPSHandler(SSLUtils.createSSLContext(True, self._certFile, self._keyFile)))
 
         queryString = queryString.encode('utf-8')
 
@@ -457,25 +469,113 @@ class ValidHTTPSConnection(HTTPSConnection):
 
 
 class ValidHTTPSHandler(HTTPSHandler):
-    def __init__(self, enable_host_check=True):
+    def __init__(self, context):
         super().__init__()
-        self._enableHostCheck = enable_host_check
+        self._context = context
 
     def https_open(self, req):
         return self.do_open(self.get_connection, req)
 
     def get_connection(self, host, timeout):
-        return ValidHTTPSConnection(host, timeout = timeout, context = self.create_context())
-
-    def create_context(self):
+        return ValidHTTPSConnection(host, timeout = timeout, context = self._context)
+    
+    
+class SSLUtils():
+    @staticmethod
+    def createSSLContext(enableHostCheck=True, certFile=None, keyFile=None):
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         context.minimum_version = ssl.TLSVersion.TLSv1_2
         context.load_verify_locations(GSRequest.caCertsPath)
         context.verify_mode = ssl.CERT_REQUIRED
-        context.check_hostname = self._enableHostCheck
+        context.check_hostname = enableHostCheck
+
+        SSLUtils.load_client_cert(context, certFile, keyFile)
 
         return context
-
+    
+    @staticmethod
+    def _is_cert_file_path(certFile, keyFile):
+        """
+        Check if certificate and key are provided as file paths (strings).
+        
+        @param certFile: Certificate file path or content
+        @param keyFile: Key file path or content
+        @return: True if both are strings (file paths), False otherwise
+        """
+        return isinstance(certFile, string_types) and isinstance(keyFile, string_types)
+    
+    @staticmethod
+    def _write_temp_file(file_descriptor, content):
+        """
+        Write content to a temporary file descriptor.
+        
+        @param file_descriptor: File descriptor to write to
+        @param content: Content to write (bytes or string)
+        """
+        if isinstance(content, bytes):
+            os.write(file_descriptor, content)
+        else:
+            os.write(file_descriptor, content.encode('utf-8'))
+        os.close(file_descriptor)
+    
+    @staticmethod
+    def _cleanup_temp_file(file_path):
+        """
+        Safely remove a temporary file.
+        
+        @param file_path: Path to the file to remove
+        """
+        try:
+            os.unlink(file_path)
+        except:
+            pass
+    
+    @staticmethod
+    def _load_cert_from_content(context, certFile, keyFile):
+        """
+        Load certificate and key from content (bytes/string) using temporary files.
+        
+        @param context: SSL context to load certificates into
+        @param certFile: Certificate content (bytes or string)
+        @param keyFile: Key content (bytes or string)
+        """
+        import tempfile
+        
+        # Create temporary files for certificate and key
+        cert_fd, cert_path = tempfile.mkstemp(suffix='.pem')
+        key_fd, key_path = tempfile.mkstemp(suffix='.key')
+        
+        try:
+            # Write certificate and key content to temporary files
+            SSLUtils._write_temp_file(cert_fd, certFile)
+            SSLUtils._write_temp_file(key_fd, keyFile)
+            
+            # Load the certificates from temporary files
+            context.load_cert_chain(certfile=cert_path, keyfile=key_path)
+        finally:
+            # Clean up temporary files
+            SSLUtils._cleanup_temp_file(cert_path)
+            SSLUtils._cleanup_temp_file(key_path)
+    
+    @staticmethod
+    def load_client_cert(context, certFile, keyFile):
+        """
+        Load client certificate and key for mTLS authentication.
+        Supports both file paths (strings) and file content (bytes).
+        
+        @param context: SSL context to load certificates into
+        @param certFile: Path to certificate file (string) or certificate content (bytes)
+        @param keyFile: Path to key file (string) or key content (bytes)
+        """
+        if not certFile or not keyFile:
+            return
+        
+        if SSLUtils._is_cert_file_path(certFile, keyFile):
+            # Load from file paths
+            context.load_cert_chain(certfile=certFile, keyfile=keyFile)
+        else:
+            # Load from content (bytes or string)
+            SSLUtils._load_cert_from_content(context, certFile, keyFile)
 
 class SigUtils():
 

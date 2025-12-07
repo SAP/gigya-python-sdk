@@ -217,6 +217,61 @@ If you would like to use Gigya service over HTTPS, you will need to do the follo
 Create a GSRequest object using the constructor that receives five parameters. 
 The additional fifth parameter is a Boolean parameter named useHTTPS. Set this parameter to be **true**.
 
+### Using Mutual TLS (mTLS) Authentication
+For high-security server-to-server communication, you can use mTLS with client certificates instead of traditional credentials. This allows you to authenticate using X.509 certificates.
+
+#### Example with Certificate Files
+```python
+from GSSDK import GSRequest
+
+# Create request with certificate file paths
+request = GSRequest(
+    apiKey="your-api-key",           
+    secretKey=None,                   
+    apiMethod='accounts.getAccountInfo',
+    params={'UID': 'user123'},
+    useHTTPS=True,
+    certFile='certs/client.pem',      # Path to client certificate
+    keyFile='certs/client.key'        # Path to private key
+)
+
+# Send the request
+response = request.send()
+
+if response.getErrorCode() == 0:
+    print("Success:", response.getResponseText())
+else:
+    print("Error:", response.getErrorMessage())
+```
+
+#### Example with Certificate Content (Bytes or Strings)
+You can also provide certificate and key content directly as bytes or strings, which is useful when loading from environment variables or secure storage:
+
+```python
+# Load certificates from environment variables or files
+with open('certs/client.pem', 'rb') as f:
+    cert_content = f.read()
+with open('certs/client.key', 'rb') as f:
+    key_content = f.read()
+
+# Create request with certificate content
+request = GSRequest(
+    apiKey="your-api-key",
+    secretKey=None,
+    apiMethod='accounts.getAccountInfo',
+    params={'UID': 'user123'},
+    useHTTPS=True,
+    certFile=cert_content,     # Certificate content as bytes
+    keyFile=key_content        # Key content as bytes
+)
+
+response = request.send()
+```
+
+**Note:** Both `certFile` and `keyFile` must be provided together for mTLS authentication. They can be either:
+- File paths (strings): `'certs/client.pem'`
+- File content (bytes or strings): Raw certificate/key data
+
 ### Appendix - Publish User Action Example
 The following code sample sends a request to publish a user action to the newsfeed stream on all the connected providers which support this feature.
 
