@@ -163,6 +163,9 @@ class GSRequest():
             self._domain = tokens[0] + "." + self._apiDomain
             self._path = "/" + self._method
 
+        if self._has_mtls_config():
+            self._domain = "accounts.gigya.com" 
+
         format = self._params.get("format", None)
 
         if format is None:
