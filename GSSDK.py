@@ -149,6 +149,18 @@ class GSRequest():
         """
         return self._certFile is not None and self._keyFile is not None
 
+    def _resolve_mtls_domain(self):
+        """
+        Resolve the mTLS domain based on the configured API domain.
+        Extracts the datacenter from _apiDomain (e.g. "eu1" from "eu1.gigya.com")
+        and returns "mtls.{datacenter}.gigya.com".
+        Defaults to mtls.us1.gigya.com if datacenter cannot be determined.
+        """
+        datacenter = self._apiDomain.split(".")[0] if self._apiDomain else None
+        if datacenter:
+            return "mtls." + datacenter + ".gigya.com"
+        return "mtls.us1.gigya.com"
+
     def send(self, timeout=None):
         """Send the request synchronously"""
 
@@ -164,7 +176,8 @@ class GSRequest():
             self._path = "/" + self._method
 
         if self._has_mtls_config():
-            self._domain = "accounts.gigya.com" 
+            self._domain = self._resolve_mtls_domain()
+
 
         format = self._params.get("format", None)
 
