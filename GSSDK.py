@@ -240,9 +240,12 @@ class GSRequest():
             # signature
             signature = self.getOAuth1Signature(secret, httpMethod, resourceURI, useHTTPS, params)
             params["sig"] = signature
-        elif token and not self._has_mtls_config():
-            # mTLS uses the client certificate as the credential, so don't send oauth_token
-            params["oauth_token"] = token
+        elif token:
+            if self._has_mtls_config():
+                # mTLS uses the client certificate as the credential, so send apiKey (not oauth_token)
+                params["apiKey"] = token
+            else:
+                params["oauth_token"] = token
 
         # get rest response.
         res = self.curl(resourceURI, params, timeout)
