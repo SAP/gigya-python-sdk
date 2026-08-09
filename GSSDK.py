@@ -485,7 +485,8 @@ class ValidHTTPSConnection(HTTPSConnection):
             self.sock = sock
             self._tunnel()
 
-        self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
+        server_hostname = self._tunnel_host if self._tunnel_host else self.host
+        self.sock = self._context.wrap_socket(sock, server_hostname=server_hostname)
 
 
 class ValidHTTPSHandler(HTTPSHandler):
