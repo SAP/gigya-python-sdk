@@ -1,5 +1,8 @@
 import unittest
-from GSSDK import GSRequest
+import ssl
+import socket
+from unittest.mock import MagicMock, patch
+from GSSDK import GSRequest, ValidHTTPSConnection, SSLUtils
 
 
 class TestResolveMtlsDomain(unittest.TestCase):
@@ -115,6 +118,98 @@ class TestSendDomainResolution(unittest.TestCase):
         request.setAPIDomain("eu1.gigya.com")
         request.send(timeout=1)
         self.assertEqual(request._domain, "accounts.eu1.gigya.com")
+
+
+class TestValidHTTPSConnectionSNI(unittest.TestCase):
+    """
+    Tests for the SNI fix in ValidHTTPSConnection.connect().
+
+    When routing through an HTTPS proxy (CONNECT tunnel), urllib sets:
+      self.host         = proxy address
+      self._tunnel_host = real destination hostname
+
+    The fix ensures the real destination is used as SNI, not the proxy.
+    """
+
+    def _make_connection(self, host, tunnel_host=None):
+        ctx = SSLUtils.createSSLContext(False, None, None)
+        conn = ValidHTTPSConnection(host, context=ctx)
+        conn._tunnel_host = tunnel_host
+        conn.timeout = 5
+        conn.source_address = None
+        return conn
+
+    def _mock_socket(self):
+        sock = MagicMock()
+        sock.setsockopt = MagicMock()
+        return sock
+
+    def test_sni_uses_tunnel_host_when_proxy_is_set(self):
+        """When going through a proxy, SNI must be the destination host, not the proxy."""
+        conn = self._make_connection("127.0.0.1", tunnel_host="accounts.us1.gigya.com")
+        mock_sock = self._mock_socket()
+        captured_sni = []
+
+        def fake_wrap(sock, server_hostname=None):
+            captured_sni.append(server_hostname)
+            raise ConnectionAbortedError("stop after SNI capture")
+
+        conn._context.wrap_socket = fake_wrap
+
+        with patch("socket.create_connection", return_value=mock_sock):
+            with patch.object(conn, "_tunnel"):
+                try:
+                    conn.connect()
+                except ConnectionAbortedError:
+                    pass
+
+        self.assertEqual(captured_sni, ["accounts.us1.gigya.com"],
+            "SNI must be the tunnel destination, not the proxy address")
+
+    def test_sni_uses_host_when_no_proxy(self):
+        """Without a proxy, SNI must be self.host (direct connection, no tunnel)."""
+        conn = self._make_connection("accounts.us1.gigya.com", tunnel_host=None)
+        mock_sock = self._mock_socket()
+        captured_sni = []
+
+        def fake_wrap(sock, server_hostname=None):
+            captured_sni.append(server_hostname)
+            raise ConnectionAbortedError("stop after SNI capture")
+
+        conn._context.wrap_socket = fake_wrap
+
+        with patch("socket.create_connection", return_value=mock_sock):
+            try:
+                conn.connect()
+            except ConnectionAbortedError:
+                pass
+
+        self.assertEqual(captured_sni, ["accounts.us1.gigya.com"],
+            "SNI must be self.host for direct connections")
+
+    def test_sni_not_proxy_ip(self):
+        """Regression: the proxy IP must never appear as SNI."""
+        conn = self._make_connection("10.0.0.1", tunnel_host="accounts.eu1.gigya.com")
+        mock_sock = self._mock_socket()
+        captured_sni = []
+
+        def fake_wrap(sock, server_hostname=None):
+            captured_sni.append(server_hostname)
+            raise ConnectionAbortedError("stop after SNI capture")
+
+        conn._context.wrap_socket = fake_wrap
+
+        with patch("socket.create_connection", return_value=mock_sock):
+            with patch.object(conn, "_tunnel"):
+                try:
+                    conn.connect()
+                except ConnectionAbortedError:
+                    pass
+
+        self.assertNotEqual(captured_sni[0], "10.0.0.1",
+            "Proxy IP must never be sent as SNI")
+        self.assertEqual(captured_sni[0], "accounts.eu1.gigya.com",
+            "SNI must be the real destination hostname")
 
 
 if __name__ == '__main__':
