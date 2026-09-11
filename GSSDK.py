@@ -48,7 +48,7 @@ from base64 import b64decode, b64encode
 from json import loads
 from json import dumps as jsonstringify
 from re import search
-from random import randrange
+import secrets
 
 if PY_3:
     string_types = str
@@ -226,7 +226,7 @@ class GSRequest():
         timestamp = calendar.timegm(time.gmtime())
 
         # unique token
-        nonce = str(SigUtils.currentTimeMillis()) + str(randrange(1000))
+        nonce = str(SigUtils.currentTimeMillis()) + str(secrets.randbelow(1000))
         httpMethod = "POST"
 
         if userKey:
